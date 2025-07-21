@@ -1,0 +1,107 @@
+name: email_sender
+description:
+  zh_CN: 通过指定的SMTP服务器发送一封电子邮件。支持纯文本和HTML格式。
+  en_US: Sends an email via a specified SMTP server. Supports both plain text and HTML formats.
+author: DifyDeveloper # 您可以改成您的名字
+homepage: https://github.com/[YOUR_USERNAME]/dify-tool-email-sender # 请将 [YOUR_USERNAME] 替换为您的 GitHub 用户名
+
+# 定义工具的输入参数，这部分会渲染成 Dify 界面上的表单
+parameters:
+  # 注意：SMTP 服务器相关配置未来将通过Dify的“工具配置”界面输入，
+  # 这里定义的是在工作流节点中需要用到的参数。
+  # 我们先定义节点参数，平台配置的逻辑在代码中处理。
+
+  # 邮件内容相关配置
+  - name: to_emails
+    type: string
+    required: true
+    form: llm # 'llm' 表示此字段适合接收变量或由LLM生成
+    label:
+      zh_CN: 收件人邮箱
+      en_US: To Emails
+    placeholder:
+      zh_CN: 多个邮箱请用英文逗号(,)分隔
+      en_US: Separate multiple emails with commas (,)
+  - name: subject
+    type: string
+    required: true
+    form: llm
+    label:
+      zh_CN: 邮件主题
+      en_US: Subject
+  - name: body
+    type: string
+    required: true
+    form: llm
+    label:
+      zh_CN: 邮件正文
+      en_US: Body
+  - name: cc_emails
+    type: string
+    required: false
+    form: llm
+    label:
+      zh_CN: 抄送邮箱
+      en_US: CC Emails
+  - name: bcc_emails
+    type: string
+    required: false
+    form: llm
+    label:
+      zh_CN: 密送邮箱
+      en_US: BCC Emails
+
+  # 邮件格式和编码配置
+  - name: mail_type
+    type: string
+    required: true
+    form: select # 'select' 会渲染成一个下拉选择框
+    default: html
+    options:
+      - value: html
+        label:
+          zh_CN: HTML 格式
+          en_US: HTML Format
+      - value: text
+        label:
+          zh_CN: 纯文本格式
+          en_US: Plain Text Format
+    label:
+      zh_CN: 邮件格式
+      en_US: Mail Format
+  - name: encoding
+    type: string
+    required: false
+    form: form # 'form' 是标准的表单输入框
+    default: utf-8
+    label:
+      zh_CN: 邮件编码
+      en_US: Mail Encoding
+    placeholder:
+      zh_CN: 默认为 utf-8，可指定 gbk 等
+      en_US: Default is utf-8, can specify others like gbk
+  
+  # 用于选择发件账号的参数
+  - name: sender_account
+    type: string
+    required: false # 设置为可选，不填则使用代码逻辑中的默认账号
+    form: select # 这个下拉框的选项将由 Dify 动态填充
+    label:
+      zh_CN: 发件账号
+      en_US: Sender Account
+    placeholder:
+      zh_CN: 默认为工具配置中的默认账号
+      en_US: Defaults to the default account in tool settings
+
+# 定义工具的输出结果
+outputs:
+  - name: status
+    type: string
+    description:
+      zh_CN: 邮件发送状态，'success' 或 'error'。
+      en_US: The status of the email sending, 'success' or 'error'.
+  - name: error_message
+    type: string
+    description:
+      zh_CN: 如果发送失败，返回的错误信息。
+      en_US: The error message if sending failed.
